@@ -10,3 +10,5 @@ from labinstruments.hittite import Hittite, SignalGenerator
 
 __author__ = "John Garrett"
 __version__ = "0.0.1"
+__license__ = "MIT"
+__copyright__ = "Copyright 2020 Smithsonian Astrophysical Observatory"
