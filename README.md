@@ -10,6 +10,8 @@ To install via ``pip``:
 
 ```bash
 python3 -m pip install git+https://github.com/Smithsonian/SCPI-Lab-Instruments.git
+# OR
+python3 -m pip install SCPI-Lab-Instruments
 ```
 
 To use the Keithley module, you also need to install the ``vxi11`` package. This can be installed by:
