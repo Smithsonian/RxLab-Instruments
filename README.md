@@ -22,7 +22,7 @@ Example
 -------
 
 ```python
-from labinstrument import *
+from labinstruments import *
 
 # Connect to Hittite signal generator
 sg = Hittite('192.168.0.159')

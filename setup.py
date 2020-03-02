@@ -6,7 +6,7 @@ from os import path
 from setuptools import setup, find_packages
 # from setuptools.command.test import test as TestCommand
 
-import labinstrument 
+import labinstruments
 
 root = path.abspath(path.dirname(__file__))
 
@@ -23,7 +23,7 @@ long_description = read('README.md')
 
 setup(
     name = "SCPI Lab Instruments",
-    version = labinstrument.__version__,
+    version = labinstruments.__version__,
     author = "John Garrett",
     author_email = "john.garrett@cfa.harvard.edu",
     description = (
