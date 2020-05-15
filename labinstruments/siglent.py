@@ -103,18 +103,18 @@ class Siglent:
         msg = 'PACU RMS,C{}'
         self._send(msg.format(channel))
 
+        time.sleep(0.2)
+
         # Read RMS voltage
         msg = "C{}:PAVA? RMS"
         self._send(msg.format(channel))
         value = self._receive()
 
-        print(value)
-
-        return value.strip()[-1]
+        return float(value.split(',')[-1][:-1])
 
 
 if __name__ == "__main__":
 
     osc = Siglent()
-    print(osc.get_idn())
+    print(osc.get_id())
 
