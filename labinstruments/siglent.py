@@ -88,7 +88,7 @@ class Siglent:
 
         self._send("*RST")
 
-    def measure_rms_voltage(self, channel=1):
+    def measure_rms_voltage(self, channel=1, average=1):
         """Measure RMS voltage.
 
         Args:
@@ -106,11 +106,14 @@ class Siglent:
         time.sleep(0.2)
 
         # Read RMS voltage
+        rms_voltage = 0
         msg = "C{}:PAVA? RMS"
-        self._send(msg.format(channel))
-        value = self._receive()
+        for _ in range(average):
+            self._send(msg.format(channel))
+            value = self._receive()
+            rms_voltage += float(value.split(',')[-1][:-1])
 
-        return float(value.split(',')[-1][:-1])
+        return rms_voltage / average
 
 
 if __name__ == "__main__":
