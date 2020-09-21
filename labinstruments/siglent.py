@@ -2,7 +2,7 @@
 
 Supported models:
 
-    ...
+    SDS 1104X-E
 
 Siglent SCPI instructions: 
 
@@ -19,13 +19,13 @@ import time
 class Siglent:
     """Class to read data from Siglent oscilloscopes.
 
-    Note:
+    Supported models (confirmed):
 
-        This has only been tested with an SDS1104X-E oscilloscope.
+        SDS 1104X-E
 
     Args:
         ip_address (string): IP address of the Siglent oscilloscope, e.g.,
-            ``ip_address='192.168.0.10'``
+            ``'ip_address='192.168.0.10'``
         port (int, optional, default is 5025): the port set for Ethernet
             communication
 
@@ -89,13 +89,14 @@ class Siglent:
         self._send("*RST")
 
     def measure_rms_voltage(self, channel=1, average=1):
-        """Measure RMS voltage.
+        """Measure rms voltage.
 
         Args:
-            units (str): units for voltage measurement
+            channel (int): channel
+            average (int): averaging
 
         Returns:
-            float: DC voltage
+            float: rms voltage
 
         """
 
