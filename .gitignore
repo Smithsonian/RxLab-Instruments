@@ -1,7 +1,13 @@
+# bytecode
 *.pyc
+__pycache__/
 
+# private directories
+dev/
+references/
+
+# build directories
 build/
 dist/
-__pycache__/
 *.egg-info/
 .eggs/
