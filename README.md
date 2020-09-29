@@ -1,7 +1,7 @@
 SCPI Lab Instruments
 ====================
 
-Control instruments in the receiver lab over Ethernet using SCPI commands
+Control various instruments in the receiver lab over Ethernet using SCPI commands
 
 Installation
 ------------
@@ -16,13 +16,13 @@ python3 -m pip install git+https://github.com/Smithsonian/SCPI-Lab-Instruments.g
 python3 -m pip install SCPI-Lab-Instruments
 ```
 
-To use the Keithley module, you need to install the ``vxi11`` package:
+To use Keithley instruments, you need to install the ``vxi11`` package:
 
 ```bash
 python3 -m pip install git+https://github.com/python-ivi/python-vxi11.git
 ```
 
-**Note:** I have not added these packages to the requirements in ``setup.py`` because this allows you to decide which packages you want/need to install. For example, if you only want to use the Hittite module, you don't need to install ``vxi11``.
+**Note:** I have not added this packages to the requirements in ``setup.py`` because this allows you to decide which packages you want/need to install. For example, if you only want to use the Hittite module, you don't need to install ``vxi11``.
 
 Supported Instruments
 ---------------------
@@ -31,6 +31,8 @@ Supported Instruments
 - Hittite HMC-T2240 signal generators
 - Keithley 2280 power supplies
 - Micro Lambda Wireless (MLBF series) YIG tuned filters
+
+This package will probably also work with closely related instruments, but I have only tested this package with the instruments listed above.
 
 Example
 -------
@@ -73,3 +75,5 @@ References
 ----------
 
 ["System Power Supply Programming Using SCPI Commands"](https://www.keysight.com/us/en/assets/7018-06572/white-papers/5992-3841.pdf) from Keysight
+
+["Control a Siglent oscilloscope with Python"](https://ktln2.org/2018/02/20/control-siglent-oscilloscope/)
