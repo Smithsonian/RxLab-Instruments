@@ -10,7 +10,6 @@ Note:
 
 import telnetlib
 
-
 FREQ_UNIT = {'hz': 1e-6, 'khz': 1e-3, 'mhz': 1, 'ghz': 1e3}
 
 

@@ -1,10 +1,8 @@
-"""Classes to control Keithley power supplies.
+"""Class to control Keithley power supplies.
 
-Note:
+Keithley SCPI commands can be found here:
 
-    Keithley SCPI commands can be found here:
-
-        https://doc.xdevs.com/doc/Keithley/2280/077085501_2280_Reference_Manual.pdf
+    https://doc.xdevs.com/doc/Keithley/2280/077085501_2280_Reference_Manual.pdf
 
 """
 
@@ -16,7 +14,7 @@ class Keithley2280:
 
     Args:
         ip_address (string): IP address of the power supply, e.g.,
-            ``'192.168.0.117'``
+            "192.168.0.117"
 
     """
 

@@ -1,10 +1,8 @@
 """Classes to control Hittite signal generators.
 
-Note:
+Hittite SCPI commands can be found here:
 
-    Hittite SCPI commands can be found here:
-
-        https://www.analog.com/media/en/technical-documentation/user-guides/hmc-t2200_family_programmers_guide_131547.pdf
+    https://www.analog.com/media/en/technical-documentation/user-guides/hmc-t2200_family_programmers_guide_131547.pdf
 
 """
 
@@ -242,4 +240,3 @@ if __name__ == "__main__":
     sg.set_frequency(5, 'GHz')
     sg.set_power(-38, 'dBm')
     sg.power_off()
-
