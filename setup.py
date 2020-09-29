@@ -1,12 +1,22 @@
-"""Setup script for SCPI-Lab-Instruments."""
+"""Setup script for SCPI-Lab-Instruments.
+
+Usage (from root folder):
+
+python -m pip install .
+
+Or to install in developer mode (allows changes to take effect immediately):
+
+python -m pip install -e .
+
+"""
 
 import io
-
 from os import path
-from setuptools import setup, find_packages
-# from setuptools.command.test import test as TestCommand
+
+from setuptools import find_packages, setup
 
 import labinstruments
+
 
 root = path.abspath(path.dirname(__file__))
 
