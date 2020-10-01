@@ -16,7 +16,7 @@ import sys
 import time
 
 
-class Siglent:
+class SiglentSDS1104XE:
     """Class to read data from Siglent oscilloscopes.
 
     Supported models (confirmed):
@@ -119,6 +119,6 @@ class Siglent:
 
 if __name__ == "__main__":
 
-    osc = Siglent()
+    osc = SiglentSDS1104XE()
     print(osc.get_id())
-
+    print(osc.measure_rms_voltage(channel=1, average=10))
