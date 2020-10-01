@@ -27,10 +27,11 @@ python3 -m pip install git+https://github.com/python-ivi/python-vxi11.git
 Supported Instruments
 ---------------------
 
-- Agilent 34410A/11A/L4411A 6.5 Digit Multimeters
-- Hittite HMC-T2240 signal generators
-- Keithley 2280 power supplies
-- Micro Lambda Wireless (MLBF series) YIG tuned filters
+- Agilent 34410A/11A/L4411A 6.5 Digit Multimeter
+- Agilent E8257D PSG Analog Signal Generator
+- Hittite HMC-T2240 Signal Generator
+- Keithley 2280 Power Supply
+- Micro Lambda Wireless (MLBF series) YIG Tuned Filter
 
 This package will probably also work with closely related instruments, but I have only tested this package with the instruments listed above.
 
@@ -38,15 +39,22 @@ Example
 -------
 
 ```python
-from labinstruments.agilent import Agilent34411A
+from labinstruments.agilent import Agilent34411A, AgilentE8257D
 from labinstruments.hittite import Hittite
 from labinstruments.keithley import Keithley2280
 from labinstruments.microlambda import YigFilter
 
-# Connect to an Agilent multimeter
-dmm = Agilent34411A("192.168.0.3", 5025)
+# Agilent multimeter
+dmm = Agilent34411A("192.168.0.3")
 print("DC voltage: {:.2f} V".format(dmm.measure_dc_voltage('V')))
-dmm.close()  # close connection
+dmm.close()
+
+# Agilent signal generator
+sig = AgilentE8257D("192.168.0.31")
+sig.set_frequency(15, "GHz")
+sig.set_power(-20, "dBm")
+sig.rf_power("on")
+sig.close()
 
 # Connect to Hittite signal generator
 sg = Hittite('192.168.0.159')
