@@ -1,3 +1,5 @@
+misc/
+
 # bytecode
 *.pyc
 __pycache__/
