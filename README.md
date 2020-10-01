@@ -1,7 +1,7 @@
-SCPI Lab Instruments
-====================
+Receiver Lab Instruments
+========================
 
-Control various instruments in the receiver lab over Ethernet using SCPI commands
+Control various instruments in the Receiver Lab over Ethernet
 
 Installation
 ------------
@@ -10,10 +10,10 @@ To install via ``pip``:
 
 ```bash
 # From the GitHub repo (latest version)
-python3 -m pip install git+https://github.com/Smithsonian/SCPI-Lab-Instruments.git
+python3 -m pip install git+https://github.com/Smithsonian/RxLab-Instruments.git
 
 # From PyPI (latest stable release)
-python3 -m pip install SCPI-Lab-Instruments
+python3 -m pip install RxLab-Instruments
 ```
 
 To use Keithley instruments, you need to install the ``vxi11`` package:

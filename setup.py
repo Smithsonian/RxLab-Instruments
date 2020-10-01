@@ -1,4 +1,4 @@
-"""Setup script for SCPI-Lab-Instruments.
+"""Setup script for RxLab-Instruments.
 
 Usage (from root folder):
 
@@ -32,13 +32,12 @@ def read(*filenames, **kwargs):
 long_description = read('README.md')
 
 setup(
-    name = "SCPI Lab Instruments",
+    name = "Receiver Lab Instruments",
     version = labinstruments.__version__,
     author = "John Garrett",
     author_email = "john.garrett@cfa.harvard.edu",
     description = (
-        "Control instruments in the receiver lab over Ethernet using SCPI "
-        "commands"
+        "Control instruments in the Receiver Lab over Ethernet"
     ),
     license = "MIT",
     keywords = [
@@ -46,9 +45,11 @@ setup(
         "Ethernet", 
         "Lab equipment", 
         "Signal generator",
-        "DC power supply"
+        "DC power supply", 
+        "Oscilloscope",
+        "Multimeter"
     ],
-    url = "https://github.com/Smithsonian/SCPI-Lab-Instruments",
+    url = "https://github.com/Smithsonian/RxLab-Instruments",
     packages=find_packages(),
     install_requires=[
         'sockets',
@@ -67,8 +68,8 @@ setup(
         "Topic :: Scientific/Engineering",
     ],
     project_urls={
-        'Changelog': 'https://github.com/Smithsonian/SCPI-Lab-Instruments/CHANGES.md',
-        'Issue Tracker': 'https://github.com/Smithsonian/SCPI-Lab-Instruments/issues',
+        'Changelog': 'https://github.com/Smithsonian/RxLab-Instruments/CHANGES.md',
+        'Issue Tracker': 'https://github.com/Smithsonian/RxLab-Instruments/issues',
     },
     # scripts=[],
 )
