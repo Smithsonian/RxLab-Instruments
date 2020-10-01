@@ -1,6 +1,6 @@
-"""SCPI-Lab-Instruments
+"""RxLab-Instruments
 
-Control instruments in the receiver lab over Ethernet using SCPI commands.
+Control various instruments in the Receiver Lab over Ethernet
 
 """
 
@@ -9,6 +9,6 @@ from labinstruments.hittite import Hittite, SignalGenerator
 # from labinstruments.microlambda import YigFilter
 
 __author__ = "John Garrett"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __license__ = "MIT"
 __copyright__ = "Copyright 2020 Smithsonian Astrophysical Observatory"

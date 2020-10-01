@@ -32,7 +32,7 @@ def read(*filenames, **kwargs):
 long_description = read('README.md')
 
 setup(
-    name = "Receiver Lab Instruments",
+    name = "RxLab-Instruments",
     version = labinstruments.__version__,
     author = "John Garrett",
     author_email = "john.garrett@cfa.harvard.edu",
