@@ -52,7 +52,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         'sockets',
-        'telnetlib',
     ],
     long_description=long_description,
     long_description_content_type='text/markdown',
