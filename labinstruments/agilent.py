@@ -172,6 +172,22 @@ class AgilentE8257D:
         msg = ':FREQ {}{}'.format(value, units)
         self._send(msg)
 
+    def get_frequency(self, units="GHz"):
+        """Get CW frequency in given units.
+
+        Args:
+            units (str): frequency units
+
+        Returns:
+            str: frequency in selected units
+
+        """
+
+        self._send(':FREQ?')
+        frequency = float(self._receive()) / _frequency_units(units)
+
+        return frequency
+
     def set_power(self, value, units="dBm"):
         """Set output power in given units.
 
@@ -183,6 +199,29 @@ class AgilentE8257D:
 
         msg = ":POW {}{}".format(value, units)
         self._send(msg)
+
+    def get_power(self, units="dBm"):
+        """Get CW output power in given units.
+
+        Args:
+            units (str): power units, default is "dBm"
+
+        Returns:
+            float: power in given units
+
+        """
+
+        # Set power output units
+        # :UNIT:POWer DBM|DBUV|DBUVEMF|V|VEMF|DB
+        msg = ":UNIT:POW {}".format(units)
+        self._send(msg)
+
+        # Get power
+        # [:SOURce]:POWer[:LEVel][:IMMediate][:AMPLitude]?
+        msg = ":POW?"
+        self._send(msg)
+
+        return float(self._receive())
 
     def rf_power(self, state="off"):
         """Toggle RF power on or off.
@@ -228,7 +267,16 @@ def _voltage_units(units):
     try:
         return voltage_units[units.lower()]
     except KeyError as e:
-        print('Error: Voltage units must be one of: V, mV, or uV')
+        print('Error: Voltage units must be one of V, mV, or uV')
+        raise e
+
+def _frequency_units(units):
+    """Get frequency multiplier."""
+    frequency_units = {'ghz': 1e9, 'mhz': 1e6, 'khz': 1e3, 'hz': 1}
+    try:
+        return frequency_units[units.lower()]
+    except KeyError as e:
+        print('Error: Frequency units must be one of GHz, MHz, kHz, or Hz')
         raise e
 
 
