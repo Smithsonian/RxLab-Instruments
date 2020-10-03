@@ -234,6 +234,18 @@ class AgilentE8257D:
         msg = ":OUTP {}".format(state)
         self._send(msg)
 
+    def power_on(self):
+        """Turn RF power on."""
+
+        msg = ":OUTP ON"
+        self._send(msg)
+
+    def power_off(self):
+        """Turn RF power off."""
+
+        msg = ":OUTP OFF"
+        self._send(msg)
+
 
     # Helper functions -------------------------------------------------------
     
