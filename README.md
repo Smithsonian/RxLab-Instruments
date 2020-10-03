@@ -28,7 +28,7 @@ Supported Instruments
 ---------------------
 
 - Agilent 34410A/11A/L4411A 6.5 Digit Multimeter
-- Agilent E8257D PSG Analog Signal Generator
+- Agilent E8257D/67D PSG Analog Signal Generator
 - Hittite HMC-T2240 Signal Generator
 - Keithley 2280 Power Supply
 - Micro Lambda Wireless (MLBF series) YIG Tuned Filter
@@ -53,7 +53,7 @@ dmm.close()
 sig = AgilentE8257D("192.168.0.31")
 sig.set_frequency(15, "GHz")
 sig.set_power(-20, "dBm")
-sig.rf_power("on")
+sig.power_on()
 sig.close()
 
 # Connect to Hittite signal generator
