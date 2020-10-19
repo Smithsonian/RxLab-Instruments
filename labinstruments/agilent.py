@@ -231,7 +231,22 @@ class AgilentE8257D:
 
         """
 
+        print("\nWarning: rf_power is depracted.")
+        print("Please use either power_on or power_off\n")
+
         msg = ":OUTP {}".format(state)
+        self._send(msg)
+
+    def power_on(self):
+        """Turn RF power on."""
+
+        msg = ":OUTP ON"
+        self._send(msg)
+
+    def power_off(self):
+        """Turn RF power off."""
+
+        msg = ":OUTP OFF"
         self._send(msg)
 
 
