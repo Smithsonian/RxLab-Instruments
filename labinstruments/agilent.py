@@ -119,7 +119,7 @@ class AgilentE8257D:
 
     Args:
         ip_address (string): IP address of the Agilent signal generator, e.g.,
-            ``ip_address='192.168.0.3'``
+            ``ip_address='192.168.0.31'``
         port (int, optional, default is 5025): the port set for Ethernet
             communication
 
@@ -150,7 +150,7 @@ class AgilentE8257D:
         self._skt.close()
 
     def get_id(self):
-        """Get identity of multimeter."""
+        """Get identity of Signal Generator."""
 
         self._send('*IDN?')
         return self._receive()
