@@ -56,3 +56,10 @@ class YigFilter:
         """Close connection."""
 
         self._tn.close()
+
+
+class YigSynthesizer(YigFilter):
+
+    def __init__(self, ip_address):
+
+        self._tn = telnetlib.Telnet(ip_address)
