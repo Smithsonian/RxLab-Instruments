@@ -37,7 +37,7 @@ class Hittite:
     #     <let sweep run>
     #     init:cont off
 
-    def __init__(self, ip_address, port=5025):
+    def __init__(self, ip_address, port=5025, verbose=False):
 
         # Create socket
         try:
@@ -55,6 +55,13 @@ class Hittite:
         except socket.error as e:
             print('Error connecting to socket on instrument: %s' % e)
             sys.exit(1)
+
+        # Get info on instrument
+        self.device = self.get_id().replace(',', ' ')
+
+        self.verbose = verbose
+        if self.verbose:
+            print(f"Signal generator: connected to {self.device}")
 
     def close(self):
         """Close connection to instrument."""
@@ -76,8 +83,13 @@ class Hittite:
 
         """
 
-        msg = 'FREQ {} {}'.format(float(freq), units)
+        freq = float(freq)
+
+        msg = 'FREQ {} {}'.format(freq, units)
         self._send(msg)
+
+        if self.verbose:
+            print(f"Signal generator: set frequency to {freq:.3f} {units}")
 
     def get_frequency(self, units='GHz'):
         """Get frequency of signal generator.
@@ -106,10 +118,14 @@ class Hittite:
 
         """
 
+        power = float(power)
         assert units.lower() == 'dbm', "Only dBm supported."
-
-        msg = 'POW {} {}'.format(float(power), units)
+        
+        msg = 'POW {} {}'.format(power, units)
         self._send(msg)
+
+        if self.verbose:
+            print(f"Signal generator: set power to {power:.0f} {units}")
 
     def get_power(self):
         """Get power from signal generator.
@@ -131,11 +147,17 @@ class Hittite:
         msg = 'OUTP 0'
         self._send(msg)
 
+        if self.verbose:
+            print("Signal generator: power off")
+
     def power_on(self):
         """Turn on output power."""
 
         msg = 'OUTP 1'
         self._send(msg)
+
+        if self.verbose:
+            print("Signal generator: power on")
 
     # Helper functions -------------------------------------------------------
     
