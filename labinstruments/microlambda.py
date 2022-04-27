@@ -25,12 +25,16 @@ class YigFilter:
     Args:
         ip_address (string): IP address of the Yig filter, e.g.,
             ``ip_address='192.168.0.159'``
+        f_adjust (float): correct for any  frequency offsets, units GHz,
+            default is 0
 
     """
 
-    def __init__(self, ip_address):
+    def __init__(self, ip_address, f_adjust=0):
 
-        self._tn = telnetlib.Telnet(ip_address)
+        self._tn = telnetlib.Telnet(host=ip_address, port=23, timeout=3)
+        self._freq_string = "F{:.3f}"
+        self.f_adjust = f_adjust
     
     def _write(self, msg):
         """Write via Telnet."""
@@ -47,9 +51,11 @@ class YigFilter:
 
         """
 
-        freq = freq * FREQ_UNIT[units.lower()]
-        msg = 'F{:.5f}'.format(float(freq))
+        # Frequency in MHz
+        freq = freq * FREQ_UNIT[units.lower()] - self.f_adjust * 1e3
 
+        # Message to instrument
+        msg = self._freq_string.format(float(freq))
         self._write(msg)
 
     def close(self):
@@ -62,4 +68,5 @@ class YigSynthesizer(YigFilter):
 
     def __init__(self, ip_address):
 
-        self._tn = telnetlib.Telnet(ip_address)
+        self._tn = telnetlib.Telnet(ip_address, port=23, timeout=3)
+        self._freq_string = "F{:.6f}"
