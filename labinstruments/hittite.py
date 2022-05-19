@@ -11,6 +11,8 @@ import socket
 import sys
 import time
 
+FREQ_UNIT_GHZ = {'hz': 1e-9, 'khz': 1e-6, 'mhz': 1e-3, 'ghz': 1}
+
 
 class Hittite:
     """Control a Hittite signal generator.
@@ -25,6 +27,9 @@ class Hittite:
             ``ip_address='192.168.0.159'``
         port (int, optional, default is 5025): the port set for Ethernet
             communication on the Hittite signal generator
+        f_adjust (float): correct for any  frequency offsets, units GHz,
+            default is 0
+        verbose (bool): verbosity
 
     """
 
@@ -37,11 +42,13 @@ class Hittite:
     #     <let sweep run>
     #     init:cont off
 
-    def __init__(self, ip_address, port=5025, verbose=False):
+    def __init__(self, ip_address, port=5025, timeout=None, f_adjust=0, verbose=False):
 
         # Create socket
         try:
             self._skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if timeout:
+                self._skt.settimeout(timeout)
         except socket.error as e:
             print('Error creating socket: %s' % e)
             sys.exit(1)
@@ -58,10 +65,12 @@ class Hittite:
 
         # Get info on instrument
         self.device = self.get_id().replace(',', ' ')
-
         self.verbose = verbose
         if self.verbose:
             print(f"Signal generator: connected to {self.device}")
+
+        # Adjust for frequency offset
+        self.f_adjust = f_adjust
 
     def close(self):
         """Close connection to instrument."""
@@ -83,9 +92,10 @@ class Hittite:
 
         """
 
-        freq = float(freq)
+        # Frequency in GHz
+        freq = freq * FREQ_UNIT_GHZ[units.lower()] - self.f_adjust
 
-        msg = 'FREQ {} {}'.format(freq, units)
+        msg = f'FREQ {freq:.9f} GHZ'
         self._send(msg)
 
         if self.verbose:
