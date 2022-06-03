@@ -64,7 +64,7 @@ class Hittite:
             sys.exit(1)
 
         # Get info on instrument
-        self.device = self.get_id().replace(',', ' ')
+        self.device = self.get_id()
         self.verbose = verbose
         if self.verbose:
             print(f"Signal generator: connected to {self.device}")
@@ -81,7 +81,7 @@ class Hittite:
         """Get identity of signal generator."""
 
         self._send('*IDN?')
-        return self._receive()
+        return self._receive().replace(',', ' ').strip()
 
     def set_frequency(self, freq, units='GHz'):
         """Set frequency.
