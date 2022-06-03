@@ -35,12 +35,35 @@ class YigFilter:
         self._tn = telnetlib.Telnet(host=ip_address, port=23, timeout=3)
         self._freq_string = "F{:.3f}"
         self.f_adjust = f_adjust
+
+        # Read start up lines
+        msg1 = self._tn.read_some()
+        msg2 = self._tn.read_some()
+        msg3 = self._tn.read_some()
+        msg4 = self._tn.read_some()
     
     def _write(self, msg):
         """Write via Telnet."""
 
         msg = msg + "\r\n"
         self._tn.write(msg.encode('ASCII'))
+
+    def _query(self, msg):
+        """Query via Telnet."""
+
+        msg = msg + "\r\n"
+        self._tn.write(msg.encode('ASCII'))
+        results = self._tn.read_some().decode("utf-8")
+        return results.replace('>', '').strip()
+
+    def get_id(self):
+
+        return "Micro Lambda Wireless Inc. " + \
+               self._query("R0000") + " " + \
+               self._query("R0001") + " " + \
+               self._query("R0002") + " (" + \
+               self._query("R0003") + " to " + \
+               self._query("R0004") + " MHz)"
 
     def set_frequency(self, freq, units='GHz'):
         """Set frequency.
@@ -70,3 +93,9 @@ class YigSynthesizer(YigFilter):
 
         self._tn = telnetlib.Telnet(ip_address, port=23, timeout=3)
         self._freq_string = "F{:.6f}"
+
+
+if __name__ == "__main__":
+
+    yig_filter = YigFilter("192.168.1.12")
+    print(yig_filter.get_id())
