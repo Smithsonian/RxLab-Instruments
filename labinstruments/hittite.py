@@ -11,10 +11,12 @@ import socket
 import sys
 import time
 
+from labinstruments.generic import GenericInstrument
+
 FREQ_UNIT_GHZ = {'hz': 1e-9, 'khz': 1e-6, 'mhz': 1e-3, 'ghz': 1}
 
 
-class Hittite:
+class Hittite(GenericInstrument):
     """Control a Hittite signal generator.
 
     Note:
@@ -27,8 +29,6 @@ class Hittite:
             ``ip_address='192.168.0.159'``
         port (int, optional, default is 5025): the port set for Ethernet
             communication on the Hittite signal generator
-        f_adjust (float): correct for any  frequency offsets, units GHz,
-            default is 0
         verbose (bool): verbosity
 
     """
@@ -42,47 +42,6 @@ class Hittite:
     #     <let sweep run>
     #     init:cont off
 
-    def __init__(self, ip_address, port=5025, timeout=None, f_adjust=0, verbose=False):
-
-        # Create socket
-        try:
-            self._skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            if timeout:
-                self._skt.settimeout(timeout)
-        except socket.error as e:
-            print('Error creating socket: %s' % e)
-            sys.exit(1)
-
-        # Connect to signal generator
-        try:
-            self._skt.connect((ip_address, port))
-        except socket.gaierror as e:
-            print('Address-related error connecting to instrument: %s' % e)
-            sys.exit(1)
-        except socket.error as e:
-            print('Error connecting to socket on instrument: %s' % e)
-            sys.exit(1)
-
-        # Get info on instrument
-        self.device = self.get_id()
-        self.verbose = verbose
-        if self.verbose:
-            print(f"Signal generator: connected to {self.device}")
-
-        # Adjust for frequency offset
-        self.f_adjust = f_adjust
-
-    def close(self):
-        """Close connection to instrument."""
-
-        self._skt.close()
-
-    def get_id(self):
-        """Get identity of signal generator."""
-
-        self._send('*IDN?')
-        return self._receive().replace(',', ' ').strip()
-
     def set_frequency(self, freq, units='GHz'):
         """Set frequency.
 
@@ -93,10 +52,9 @@ class Hittite:
         """
 
         # Frequency in GHz
-        freq = freq * FREQ_UNIT_GHZ[units.lower()] - self.f_adjust
+        freq_ghz = freq * FREQ_UNIT_GHZ[units.lower()]
 
-        msg = f'FREQ {freq:.9f} GHZ'
-        self._send(msg)
+        self._send(f'FREQ {freq_ghz:.9f} GHZ')
 
         if self.verbose:
             print(f"Signal generator: set frequency to {freq:.3f} {units}")
@@ -113,11 +71,7 @@ class Hittite:
 
         """
 
-        msg = 'FREQ?'
-        self._send(msg)
-        freq = float(self._receive())
-
-        return freq / _frequency_units(units)
+        return float(self._query('FREQ?')) / _frequency_units(units)
 
     def set_power(self, power, units='dBm'):
         """Set power.
@@ -131,11 +85,10 @@ class Hittite:
         power = float(power)
         assert units.lower() == 'dbm', "Only dBm supported."
         
-        msg = 'POW {} {}'.format(power, units)
-        self._send(msg)
+        self._send(f'POW {power} {units}')
 
         if self.verbose:
-            print(f"Signal generator: set power to {power:.0f} {units}")
+            print(f"Signal generator: set power to {power:.3f} {units}")
 
     def get_power(self):
         """Get power from signal generator.
@@ -145,17 +98,12 @@ class Hittite:
 
         """
 
-        msg = 'POW?'
-        self._send(msg)
-        power = float(self._receive())
-
-        return power
+        return float(self._query('POW?'))
 
     def power_off(self):
         """Turn off output power."""
 
-        msg = 'OUTP 0'
-        self._send(msg)
+        self._send('OUTP 0')
 
         if self.verbose:
             print("Signal generator: power off")
@@ -163,35 +111,10 @@ class Hittite:
     def power_on(self):
         """Turn on output power."""
 
-        msg = 'OUTP 1'
-        self._send(msg)
+        self._send('OUTP 1')
 
         if self.verbose:
             print("Signal generator: power on")
-
-    # Helper functions -------------------------------------------------------
-    
-    def _send(self, msg):
-        """Send command to instrument.
-
-        Args:
-            msg (string): command to send
-
-        """
-
-        msg = msg + '\n'
-        self._skt.send(msg.encode('ASCII'))
-
-    def _receive(self):
-        """Receive message from instrument.
-
-        Returns:
-            string: output from instrument
-
-        """
-
-        msg = self._skt.recv(1024).decode('ASCII')
-        return msg.strip()
 
 
 class SignalGenerator(Hittite):
