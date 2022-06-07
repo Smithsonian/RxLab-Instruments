@@ -1,6 +1,6 @@
 """RxLab-Instruments
 
-Control various instruments in the Receiver Lab over Ethernet
+Control various instruments in the Receiver Lab over LAN.
 
 """
 
