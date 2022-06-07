@@ -2,24 +2,22 @@
 
 Supported models:
     
-    FSVA-40
+    FSVA-40: spectrum analyzer
 
 SCPI documentation: 
-
     
     https://scdn.rohde-schwarz.com/ur/pws/dl_downloads/dl_common_library/dl_manuals/gb_1/f/fsv_1/FSVA_FSV_UserManual_en_13.pdf
 
 """
 
-import os
-import socket
-import sys
 import time
 
 import numpy as np
 
+from labinstruments.generic import GenericInstrument
 
-class RohdeSchwarzFSVA40:
+
+class RohdeSchwarzFSVA40(GenericInstrument):
     """Class to read data from a Rohde & Schwarz FSVA-40 spectrum analyzer.
 
     Args:
@@ -27,41 +25,6 @@ class RohdeSchwarzFSVA40:
         port (int, optional, default is 5025): the port set for Ethernet communication
 
     """
-
-    def __init__(self, ip_address, port=5025):
-
-        # Create socket
-        try:
-            self._skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error as e:
-            print('Error creating socket: %s' % e)
-            sys.exit(1)
-
-        # Connect to multimeter
-        try:
-            self._skt.connect((ip_address, port))
-        except socket.gaierror as e:
-            print('Address-related error connecting to instrument: %s' % e)
-            sys.exit(1)
-        except socket.error as e:
-            print('Error connecting to socket on instrument: %s' % e)
-            sys.exit(1)
-
-    def close(self):
-        """Close connection to instrument."""
-
-        self._skt.close()
-
-    def get_id(self):
-        """Get identity of multimeter."""
-
-        self._send('*IDN?')
-        return self._receive().replace(',', ' ')
-
-    def reset(self):
-        """Reset multimeter."""
-
-        self._send("*RST")
 
     # Settings ---------------------------------------------------------------
 
@@ -105,25 +68,51 @@ class RohdeSchwarzFSVA40:
 
         self._send(f"BAND:VID:RAT {1/ratio:.2f}")
 
+    def set_reference_level(self, level=0, units="dBm"):
+
+        self._send(f"DISP:TRAC:Y:RLEV {level:.0f}{units}")
+
     # Sweep ------------------------------------------------------------------
 
     def single_sweep(self):
 
         self._send("SWE:CONT OFF")
+        self._send("INIT")
 
     def continuous_sweep(self):
 
         self._send("SWE:CONT ON")
-
-    def start_and_wait(self):
-
         self._send("INIT")
+
+    def sweep(self, count=1):
+
+        self._send(f"SWE:COUN {count:d}")
+        self._send("SWE:CONT OFF")
         self._send("SYST:DISP:UPD ON")
-        self.wait_for_completion()
+        start_time = time.time()
+        self._send("INIT")
+        current_count = 0
+        while current_count < count:
+            current_count = int(self._query("SWE:COUN:CURR?"))
+            time.sleep(0.01)
+        total_time = time.time() - start_time
+        print(f"Time to sweep: {total_time:.2f} s")
 
-    def wait_for_completion(self):
+    def set_sweep_points(self, n_pts):
 
-        self._query("*OPC?")
+        self._send(f"SWE:POIN {n_pts}")
+
+    def set_sweep_time(self, sweep_time):
+
+        if isinstance(sweep_time, str) and sweep_time.lower() == 'auto':
+            self._send(f"SWE:TIME:AUTO ON")
+        else:
+            self._send(f"SWE:TIME:AUTO OFF")
+            self._send(f"SWE:TIME {sweep_time:.3f}s")
+
+    def set_sweep_type(self, sweep_type="auto"):
+
+        self._send(f"SWE:TYPE {sweep_type.upper()}")
 
     # Averaging --------------------------------------------------------------
 
@@ -145,9 +134,9 @@ class RohdeSchwarzFSVA40:
 
         self._send(f"CALC:MARK{n_marker:d} {state.upper()}")
 
-    def marker_frequency(self, f_ghz, n_marker=1):
+    def marker_frequency(self, freq, units="GHz", n_marker=1):
 
-        self._send(f"CALC:MARK{n_marker:d}:X {f_ghz*1000:.6f}MHz")
+        self._send(f"CALC:MARK{n_marker:d}:X {freq:.6f}{units}")
 
     def marker_value(self, n_marker=1):
 
@@ -168,91 +157,92 @@ class RohdeSchwarzFSVA40:
         
         return x, y
 
-    # Helper functions -------------------------------------------------------
-    
-    def _send(self, msg):
-        """Send command to instrument.
+    # External mixer ---------------------------------------------------------
 
-        Args:
-            msg (string): command to send
+    def external_mixer_state(self, state="ON"):
 
-        """
+        self._send(f"MIX {state.upper()}")
 
-        msg = msg + '\n'
-        self._skt.send(msg.encode('ASCII'))
+    def set_external_mixer_band(self, band="F"):
 
-    def _receive(self):
-        """Receive message from instrument.
+        self.external_mixer_state("ON")
+        self._send(f"MIX:HARM:BAND {band.upper()}")
 
-        Returns:
-            string: output from instrument
+    def set_external_mixer_signal_detection(self, state="AUTO"):
 
-        """
-
-        msg = self._skt.recv(1024).decode('ASCII')
-        return msg.strip()
-
-    def _receive_all(self):
-
-        BUFF_SIZE = 1024
-        data = b''
-        while True:
-            time.sleep(0.01)
-            part = self._skt.recv(1024)
-            data += part
-            if len(part) < 1024:
-                break
-        return data.decode('ASCII')
-
-    def _query(self, msg):
-
-        self._send(msg)
-        return self._receive()
-
+        self.external_mixer_state("ON")
+        self._send(f"MIX:SIGN {state.upper()}")
 
 if __name__ == "__main__":
 
+    import scipy.constants as sc
     import matplotlib.pyplot as plt 
     plt.style.use(['science', 'notebook'])
+
+    khz, mhz, ghz = sc.kilo, sc.mega, sc.giga
+
+    # Parameters
+    fcenter_ghz = 7
+    fspan_mhz = 10
+    sweep_npts = 401
+    rbw_khz = 100
+    vbw_khz = rbw_khz / 30
+    averaging = 100
 
     # Connect to instrument
     speca = RohdeSchwarzFSVA40("192.168.1.40")
     print("\n" + speca.get_id())
 
     # Frequency range
-    speca.set_center_frequency(7, 'ghz')
-    speca.set_span(10, 'mhz')
-
-    # Averaging
-    speca.averaging(100)
-    speca.averaging_state("on")
+    speca.set_center_frequency(fcenter_ghz, 'ghz')
+    speca.set_span(fspan_mhz, 'mhz')
+    speca.set_sweep_points(sweep_npts)
 
     # Resolution / video bandwidth
     speca.set_rbw_auto("off")
+    speca.set_rbw(rbw_khz, 'khz')
     speca.set_vbw_auto("off")
-    speca.set_bw_ratio(3)
-    speca.set_rbw(0.010)
+    speca.set_vbw(vbw_khz, 'khz')
+    speca.set_sweep_time("auto")
+    speca.set_sweep_type("fft")
+
+    # Averaging
+    speca.averaging(averaging)
+    speca.averaging_state("on")
 
     # Run sweep (wait for completion)
-    speca.single_sweep()
-    speca.start_and_wait()
+    speca.sweep(count=averaging)
 
     # Set marker
     speca.marker_state("on", 1)
-    speca.marker_peak_search("on", 1)
-    time.sleep(0.1)
-    speca.marker_peak_search("off", 1)
-    time.sleep(0.1)
+    speca.marker_frequency(fcenter_ghz, 'ghz')
 
     # Measure power at marker frequency
-    print("\n\tPower: " + speca.marker_value() + " dBm")
+    p_peak = float(speca.marker_value())
 
     # Grab entire trace
     trace_x, trace_y = speca.get_trace()
+
+    # Background
+    temperature = 295  # K
+    bg = 10 * np.log10(sc.k * temperature * rbw_khz * khz)  # dBm/RBW
+
+    # Normalize
+    norm = np.mean(trace_y[:75]) - bg
+
+    print(f"\n\tPeak power:       {p_peak - norm:7.1f} dBm")
+    print(f"\n\tBackground:       {bg:7.1f} dBm / {rbw_khz:.0f} kHz")
+    print(f"\n\tSignal-to-noise:  {p_peak - norm - bg:7.1f} dB")
+    print(f"\n\tConversion gain:  {norm:7.1f} dB")
+
     plt.figure()
-    plt.plot(trace_x / 1e9, trace_y)
+    plt.plot(trace_x / ghz, trace_y - norm, label='Data')
+    plt.plot(fcenter_ghz, p_peak - norm, 'r*', label=f"Peak: {p_peak - norm:.1f} dBm", ms=10)
+    plt.axhline(bg, c='k', ls='--', label=f"BG: {bg:.1f} dBm/RBW")
     plt.xlabel("Frequency (GHz)")
     plt.ylabel("Power (dBm)")
+    plt.legend(fontsize=12)
+    plt.title(f"{fcenter_ghz:.1f} GHz, RBW = {rbw_khz:.0f} kHz, averaging = {averaging:d}")
     plt.show()
 
     print("")
