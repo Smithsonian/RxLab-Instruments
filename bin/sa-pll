@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from labinstruments.rohdeschwarz import RohdeSchwarzFSVA40
+
+print("\nSetup the spectrum analyzer to look at the PLL's IF monitor (100 MHz)")
+
+# Parameters
+fcenter_mhz = 100
+fspan_mhz = 200
+rbw_khz = 100
+vbw_khz = rbw_khz / 30
+ref_level = -20
+
+# Connect to instrument
+speca = RohdeSchwarzFSVA40("192.168.1.40")
+print("\n\t" + speca.get_id())
+speca.reset()
+
+# Frequency range
+speca.set_center_frequency(fcenter_mhz, 'mhz')
+speca.set_span(fspan_mhz, 'mhz')
+
+# Resolution / video bandwidth
+speca.set_rbw_auto("off")
+speca.set_rbw(rbw_khz, 'khz')
+speca.set_vbw_auto("off")
+speca.set_vbw(vbw_khz, 'khz')
+
+# Reference level
+speca.set_reference_level(ref_level, "dBm")
+
+# Set marker
+speca.marker_state("on", 1)
+speca.marker_frequency(fcenter_mhz, 'mhz')
+
+print(f"\n\tCenter frequency: {fcenter_mhz:7.3f} MHz")
+print(f"  \tSpan:             {fspan_mhz:7.3f} MHz")
+print(f"  \tRBW:              {rbw_khz:7.3f} kHz")
+print(f"  \tVBW:              {vbw_khz:7.3f} kHz\n")
