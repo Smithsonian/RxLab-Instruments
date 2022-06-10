@@ -70,7 +70,17 @@ class RohdeSchwarzFSVA40(GenericInstrument):
 
     def set_reference_level(self, level=0, units="dBm"):
 
-        self._send(f"DISP:TRAC:Y:RLEV {level:.0f}{units}")
+        if isinstance(level, float) or isinstance(level, int):
+            self._send(f"DISP:TRAC:Y:RLEV {level:.0f}{units}")
+        elif level.lower() == "auto":
+            self._send("ADJ:LEV")
+
+    def set_attenuation(self, attenuation):
+
+        if isinstance(attenuation, float) or isinstance(attenuation, int):
+            self._send(f"INP:ATT {attenuation:.0f}dB")
+        elif attenuation.lower() == "auto":
+            self._send("INP:ATT:AUTO ON")
 
     # Sweep ------------------------------------------------------------------
 
@@ -84,19 +94,31 @@ class RohdeSchwarzFSVA40(GenericInstrument):
         self._send("SWE:CONT ON")
         self._send("INIT")
 
-    def sweep(self, count=1):
+    def sweep(self, count=1, wait=True, verbose=False):
 
         self._send(f"SWE:COUN {count:d}")
         self._send("SWE:CONT OFF")
         self._send("SYST:DISP:UPD ON")
-        start_time = time.time()
         self._send("INIT")
+        if wait:
+            return self.wait(count=count, verbose=verbose)
+        else:
+            pass
+
+    def wait(self, count=1, verbose=False):
+
+        if verbose:
+            print("\tWaiting for sweep...")
+        start_time = time.time()
         current_count = 0
         while current_count < count:
-            current_count = int(self._query("SWE:COUN:CURR?"))
+            current_count = self.get_count()
             time.sleep(0.01)
         total_time = time.time() - start_time
-        print(f"Time to sweep: {total_time:.2f} s")
+        if verbose:
+            print("\t\t-> done")
+            print(f"\t\t-> sweep time: {total_time:.2f} s")
+        return count
 
     def set_sweep_points(self, n_pts):
 
@@ -114,17 +136,21 @@ class RohdeSchwarzFSVA40(GenericInstrument):
 
         self._send(f"SWE:TYPE {sweep_type.upper()}")
 
+    def get_count(self):
+
+        return int(self._query("SWE:COUN:CURR?"))
+
     # Averaging --------------------------------------------------------------
 
-    def averaging_state(self, state="ON", n_trace=1):
+    def set_averaging_state(self, state="ON", n_trace=1):
 
         self._send(f"AVER:STAT{n_trace:d} {state.upper()}")
 
-    def averaging(self, averaging=40):
+    def set_averaging(self, averaging=40):
 
         self._send(f"AVER:COUN {averaging:d}")
 
-    def averaging_type(self, avg_type="power"):
+    def set_averaging_type(self, avg_type="power"):
 
         self._send(f"AVER:TYPE {avg_type.upper()}")
 
