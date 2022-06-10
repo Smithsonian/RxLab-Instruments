@@ -15,8 +15,6 @@ from os import path
 
 from setuptools import find_packages, setup
 
-import labinstruments
-
 
 root = path.abspath(path.dirname(__file__))
 
@@ -33,7 +31,7 @@ long_description = read('README.md')
 
 setup(
     name = "RxLab-Instruments",
-    version = labinstruments.__version__,
+    version = "0.0.3",
     author = "John Garrett",
     author_email = "john.garrett@cfa.harvard.edu",
     description = (
@@ -71,5 +69,9 @@ setup(
         'Changelog': 'https://github.com/Smithsonian/RxLab-Instruments/CHANGES.md',
         'Issue Tracker': 'https://github.com/Smithsonian/RxLab-Instruments/issues',
     },
-    # scripts=[],
+    scripts=[
+        "bin/sa-gunn",
+        "bin/sa-pll",
+        "bin/sa-pll-zoom",
+    ],
 )
