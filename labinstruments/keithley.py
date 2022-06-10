@@ -9,8 +9,10 @@ Keithley SCPI commands can be found here:
 import vxi11
 import pyvisa as visa
 
+from labinstruments.generic import GenericInstrumentVX11
 
-class Keithley2280:
+
+class Keithley2280(GenericInstrumentVX11):
     """Control a Keithley 2280 power supply.
 
     Args:
@@ -21,28 +23,11 @@ class Keithley2280:
 
     def __init__(self, ip_address):
 
-        self._inst = vxi11.Instrument(ip_address)
-
-        self.id = self.get_id()
+        super(self.__class__, self).__init__(ip_address)
 
         # Ask if output is on
         output = self._inst.ask(':OUTP?')
         self.output = output == '1'
-
-    def close(self):
-        """Close connection to instrument."""
-
-        self._inst.close()
-
-    def get_id(self):
-        """Get identity of signal generator."""
-
-        return self._inst.ask('*IDN?').replace(',', ' ').strip()
-
-    def reset(self):
-        """Reset instrument."""
-
-        self._inst.write("*RST")
 
     def set_voltage(self, voltage):
         """Set voltage.
@@ -52,8 +37,7 @@ class Keithley2280:
 
         """
 
-        msg = ':VOLT {}'.format(float(voltage))
-        self._inst.write(msg)
+        self._inst.write(f':VOLT {voltage:.3f}')
         if self.output:
             _ = self.get_voltage()
 
@@ -65,8 +49,7 @@ class Keithley2280:
 
         """
 
-        msg = ':VOLT:LIM {}'.format(float(voltage))
-        self._inst.write(msg)
+        self._inst.write(f':VOLT:LIM {voltage:.3f}')
         if self.output:
             _ = self.get_voltage()
 
@@ -89,8 +72,7 @@ class Keithley2280:
 
         """
 
-        msg = ':CURR {}'.format(float(current))
-        self._inst.write(msg)
+        self._inst.write(f':CURR {current:.3f}')
         if self.output:
             _ = self.get_current()
 
@@ -102,8 +84,7 @@ class Keithley2280:
 
         """
 
-        msg = ':CURR:LIM {}'.format(float(current))
-        self._inst.write(msg)
+        self._inst.write(f':CURR:LIM {current:.3f}')
         if self.output:
             _ = self.get_current()
 
@@ -118,29 +99,28 @@ class Keithley2280:
         self._inst.write(":FORM:ELEM \"READ\"")
         return self._inst.ask(':MEAS:CURR?')
 
+    def power_on(self):
+        """Turn on output power."""
+
+        self._inst.write(':OUTP ON')
+        self.output = True
+
     def power_off(self):
         """Turn off output power."""
 
-        msg = ':OUTP OFF'
-        self._inst.write(msg)
+        self._inst.write(':OUTP OFF')
         self.output = False
+
+    def output_on(self):
+        """Turn on output power."""
+
+        self.power_on()
 
     def output_off(self):
         """Turn off output poewr."""
 
         self.power_off()
 
-    def power_on(self):
-        """Turn on output power."""
-
-        msg = ':OUTP ON'
-        self._inst.write(msg)
-        self.output = True
-
-    def output_on(self):
-        """Turn on output power."""
-
-        self.power_on()
 
 class Keithley2602:
     """Control a Keithley 2602 SourceMeter.
@@ -170,11 +150,6 @@ class Keithley2602:
         self._write("x = " + command)
         result = self._inst.query("print(x)")
         return float(result)
-
-    def close(self):
-        """Close connection to instrument."""
-
-        self._inst.close()
 
     def get_id(self):
         """Get identity of signal generator."""
