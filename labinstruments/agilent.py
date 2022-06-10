@@ -12,13 +12,10 @@ Agilent SCPI instructions:
 
 """
 
-import os
-import socket
-import sys
-import time
+from labinstruments.generic import GenericInstrument
 
 
-class Agilent34411A:
+class Agilent34411A(GenericInstrument):
     """Class to read data from an Agilent multimeter.
 
     Note:
@@ -34,41 +31,6 @@ class Agilent34411A:
 
     """
 
-    def __init__(self, ip_address, port=5025):
-
-        # Create socket
-        try:
-            self._skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error as e:
-            print('Error creating socket: %s' % e)
-            sys.exit(1)
-
-        # Connect to multimeter
-        try:
-            self._skt.connect((ip_address, port))
-        except socket.gaierror as e:
-            print('Address-related error connecting to instrument: %s' % e)
-            sys.exit(1)
-        except socket.error as e:
-            print('Error connecting to socket on instrument: %s' % e)
-            sys.exit(1)
-
-    def close(self):
-        """Close connection to instrument."""
-
-        self._skt.close()
-
-    def get_id(self):
-        """Get identity of multimeter."""
-
-        self._send('*IDN?')
-        return self._receive()
-
-    def reset(self):
-        """Reset multimeter."""
-
-        self._send("*RST")
-
     def measure_dc_voltage(self, units="V"):
         """Measure DC voltage.
 
@@ -81,37 +43,10 @@ class Agilent34411A:
         """
 
         msg = 'MEAS:VOLT:DC?'
-        self._send(msg)
-        dc_voltage = float(self._receive()) / _voltage_units(units)
-
-        return dc_voltage
-
-    # Helper functions -------------------------------------------------------
-    
-    def _send(self, msg):
-        """Send command to instrument.
-
-        Args:
-            msg (string): command to send
-
-        """
-
-        msg = msg + '\n'
-        self._skt.send(msg.encode('ASCII'))
-
-    def _receive(self):
-        """Receive message from instrument.
-
-        Returns:
-            string: output from instrument
-
-        """
-
-        msg = self._skt.recv(1024).decode('ASCII')
-        return msg.strip()
+        return float(self._query(msg)) / _voltage_units(units)
 
 
-class AgilentE8257D:
+class AgilentE8257D(GenericInstrument):
     """Class to control an Agilent signal generator.
 
     This has only been tested with an E8257D PSG analog signal generator, but
@@ -124,41 +59,6 @@ class AgilentE8257D:
             communication
 
     """
-
-    def __init__(self, ip_address, port=5025):
-
-        # Create socket
-        try:
-            self._skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error as e:
-            print('Error creating socket: %s' % e)
-            sys.exit(1)
-
-        # Connect to signal generator
-        try:
-            self._skt.connect((ip_address, port))
-        except socket.gaierror as e:
-            print('Address-related error connecting to instrument: %s' % e)
-            sys.exit(1)
-        except socket.error as e:
-            print('Error connecting to socket on instrument: %s' % e)
-            sys.exit(1)
-
-    def close(self):
-        """Close connection to instrument."""
-
-        self._skt.close()
-
-    def get_id(self):
-        """Get identity of Signal Generator."""
-
-        self._send('*IDN?')
-        return self._receive()
-
-    def reset(self):
-        """Reset multimeter."""
-
-        self._send("*RST")
 
     def set_frequency(self, value, units="GHz"):
         """Set CW frequency in given units.
@@ -183,10 +83,8 @@ class AgilentE8257D:
 
         """
 
-        self._send(':FREQ?')
-        frequency = float(self._receive()) / _frequency_units(units)
-
-        return frequency
+        msg = ':FREQ?'
+        return float(self._query(msg)) / _frequency_units(units)
 
     def set_power(self, value, units="dBm"):
         """Set output power in given units.
@@ -219,9 +117,7 @@ class AgilentE8257D:
         # Get power
         # [:SOURce]:POWer[:LEVel][:IMMediate][:AMPLitude]?
         msg = ":POW?"
-        self._send(msg)
-
-        return float(self._receive())
+        return float(self._query(msg))
 
     def rf_power(self, state="off"):
         """Toggle RF power on or off.
@@ -249,30 +145,6 @@ class AgilentE8257D:
         msg = ":OUTP OFF"
         self._send(msg)
 
-
-    # Helper functions -------------------------------------------------------
-    
-    def _send(self, msg):
-        """Send command to instrument.
-
-        Args:
-            msg (string): command to send
-
-        """
-
-        msg = msg + '\n'
-        self._skt.send(msg.encode('ASCII'))
-
-    def _receive(self):
-        """Receive message from instrument.
-
-        Returns:
-            string: output from instrument
-
-        """
-
-        msg = self._skt.recv(1024).decode('ASCII')
-        return msg.strip()
 
 # Helper functions -----------------------------------------------------------
 
