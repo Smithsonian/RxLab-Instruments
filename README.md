@@ -1,7 +1,7 @@
 Receiver Lab Instruments
 ========================
 
-Control various instruments in the Receiver Lab over Ethernet
+Control various instruments in the Receiver Lab over LAN.
 
 Installation
 ------------
@@ -22,7 +22,13 @@ To use Keithley instruments, you need to install the ``vxi11`` package:
 python3 -m pip install git+https://github.com/python-ivi/python-vxi11.git
 ```
 
-**Note:** I have not added this packages to the requirements in ``setup.py`` because this allows you to decide which packages you want/need to install. For example, if you only want to use the Hittite module, you don't need to install ``vxi11``.
+To use Rohde & Schwarz instruments, you need to install the ``pyvisa`` package:
+
+```bash
+python3 -m pip install -U pyvisa
+```
+
+**Note:** I have not added these packages to the requirements in ``setup.py`` because this allows you to decide which packages you want/need to install. For example, if you only want to use the Hittite module, you don't need to install ``vxi11`` or ``pyvisa``.
 
 Supported Instruments
 ---------------------
@@ -31,7 +37,11 @@ Supported Instruments
 - Agilent E8257D/67D PSG Analog Signal Generator
 - Hittite HMC-T2240 Signal Generator
 - Keithley 2280 Power Supply
-- Micro Lambda Wireless (MLBF series) YIG Tuned Filter
+- Keithley 2602 Source Meter
+- Micro Lambda Wireless (MLBF series) YIG Tuned Filters
+- Micro Lambda Wireless YIG Tuned Synthesizers
+- Rohde & Schwarz FSVA40 Spectrum Analyzer
+- Siglent SDS-1104X-E Oscilloscope
 
 This package will probably also work with closely related instruments, but I have only tested this package with the instruments listed above.
 
