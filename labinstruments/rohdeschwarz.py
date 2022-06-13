@@ -156,19 +156,19 @@ class RohdeSchwarzFSVA40(GenericInstrument):
 
     # Marker -----------------------------------------------------------------
 
-    def marker_state(self, state="ON", n_marker=1):
+    def set_marker_state(self, state="ON", n_marker=1):
 
         self._send(f"CALC:MARK{n_marker:d} {state.upper()}")
 
-    def marker_frequency(self, freq, units="GHz", n_marker=1):
+    def set_marker_frequency(self, freq, units="GHz", n_marker=1):
 
         self._send(f"CALC:MARK{n_marker:d}:X {freq:.6f}{units}")
 
-    def marker_value(self, n_marker=1):
+    def get_marker_value(self, n_marker=1):
 
         return self._query(f"CALC:MARK{n_marker:d}:Y?")
 
-    def marker_peak_search(self, state='on', n_marker=1):
+    def set_marker_peak_search(self, state='on', n_marker=1):
 
         self._send(f"CALC:MARK{n_marker:d}:MAX:AUTO {state.upper()}")
 
@@ -185,7 +185,7 @@ class RohdeSchwarzFSVA40(GenericInstrument):
 
     # External mixer ---------------------------------------------------------
 
-    def external_mixer_state(self, state="ON"):
+    def set_external_mixer_state(self, state="ON"):
 
         self._send(f"MIX {state.upper()}")
 
@@ -199,10 +199,11 @@ class RohdeSchwarzFSVA40(GenericInstrument):
         self.external_mixer_state("ON")
         self._send(f"MIX:SIGN {state.upper()}")
 
+
 if __name__ == "__main__":
 
-    import scipy.constants as sc
-    import matplotlib.pyplot as plt 
+    import matplotlib.pyplot as plt
+    import scipy.constants as sc 
     plt.style.use(['science', 'notebook'])
 
     khz, mhz, ghz = sc.kilo, sc.mega, sc.giga
