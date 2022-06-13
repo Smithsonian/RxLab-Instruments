@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from labinstruments.rohdeschwarz import RohdeSchwarzFSVA40
+
+# Parameters
+f_start_ghz = 90
+f_stop_ghz = 120
+rbw_mhz = 2
+vbw_khz = 100
+rlevel_dbm = 9
+
+# Connect to instrument
+speca = RohdeSchwarzFSVA40("192.168.1.40")
+print("\n" + speca.get_id())
+speca.reset()
+print("")
+
+# Frequency range
+speca.set_min_frequency(f_start_ghz, 'ghz')
+speca.set_max_frequency(f_stop_ghz, 'ghz')
+
+# Resolution / video bandwidth
+speca.set_rbw_auto("off")
+speca.set_rbw(rbw_mhz, 'mhz')
+speca.set_vbw_auto("off")
+speca.set_vbw(vbw_khz, 'khz')
+
+# Set reference level
+speca.set_reference_level(rlevel_dbm, "dBm")
+
+# External mixer
+speca.set_external_mixer_state("ON")
+speca.set_external_mixer_band("F")
+speca.set_external_mixer_signal_detection("AUTO")
+
+# Marker
+speca.set_marker_state("ON")
+speca.set_marker_peak_search()
