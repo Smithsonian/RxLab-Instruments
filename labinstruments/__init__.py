@@ -9,6 +9,5 @@ from labinstruments.hittite import Hittite, SignalGenerator
 # from labinstruments.microlambda import YigFilter
 
 __author__ = "John Garrett"
-__version__ = "0.0.2"
 __license__ = "MIT"
-__copyright__ = "Copyright 2020 Smithsonian Astrophysical Observatory"
+__copyright__ = "Copyright 2022 Smithsonian Astrophysical Observatory"
