@@ -42,12 +42,14 @@ class YigFilter(GenericInstrumentTelnet):
 
     def get_id(self):
 
+        fmin_ghz = float(self._query("R0003")) / 1000
+        fmax_ghz = float(self._query("R0004")) / 1000
+
         return "Micro Lambda Wireless Inc. " + \
                self._query("R0000") + " " + \
                self._query("R0001") + " " + \
-               self._query("R0002") + " (" + \
-               self._query("R0003") + " to " + \
-               self._query("R0004") + " MHz)"
+               self._query("R0002") + \
+               f" ({fmin_ghz:.0f} to {fmax_ghz:.0f} GHz)"
 
     def set_frequency(self, freq, units='GHz'):
         """Set frequency.
