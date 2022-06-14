@@ -191,12 +191,12 @@ class RohdeSchwarzFSVA40(GenericInstrument):
 
     def set_external_mixer_band(self, band="F"):
 
-        self.external_mixer_state("ON")
+        self.set_external_mixer_state("ON")
         self._send(f"MIX:HARM:BAND {band.upper()}")
 
     def set_external_mixer_signal_detection(self, state="AUTO"):
 
-        self.external_mixer_state("ON")
+        self.set_external_mixer_state("ON")
         self._send(f"MIX:SIGN {state.upper()}")
 
 
