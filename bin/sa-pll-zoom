@@ -31,8 +31,8 @@ speca.set_vbw(vbw_hz, 'hz')
 speca.set_reference_level(ref_level, "dBm")
 
 # Set marker
-speca.marker_state("on", 1)
-speca.marker_frequency(fcenter_mhz, 'mhz')
+speca.set_marker_state("on", 1)
+speca.set_marker_frequency(fcenter_mhz, 'mhz')
 
 print(f"\n\tCenter frequency: {fcenter_mhz:7.3f} MHz")
 print(f"  \tSpan:             {fspan_mhz:7.3f} MHz")
