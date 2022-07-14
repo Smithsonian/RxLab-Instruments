@@ -18,7 +18,7 @@ from labinstruments.generic import GenericInstrument
 
 
 class RohdeSchwarzFSVA40(GenericInstrument):
-    """Class to read data from a Rohde & Schwarz FSVA-40 spectrum analyzer.
+    """Class to control a Rohde & Schwarz FSVA-40 spectrum analyzer.
 
     Args:
         ip_address (string): IP address, e.g., ``ip_address='192.168.0.3'``
@@ -108,15 +108,15 @@ class RohdeSchwarzFSVA40(GenericInstrument):
     def wait(self, count=1, verbose=False):
 
         if verbose:
-            print("\tWaiting for sweep...")
+            print("\t\tWaiting for sweep...")
         start_time = time.time()
+        time.sleep(0.1)
         current_count = 0
         while current_count < count:
             current_count = self.get_count()
             time.sleep(0.01)
         total_time = time.time() - start_time
         if verbose:
-            print("\t\t-> done")
             print(f"\t\t-> sweep time: {total_time:.2f} s")
         return count
 
