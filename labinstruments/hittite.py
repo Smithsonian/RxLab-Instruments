@@ -116,6 +116,16 @@ class Hittite(GenericInstrument):
         if self.verbose:
             print("Signal generator: power on")
 
+    def get_output_state(self):
+        """Get output on/off state from signal generator.
+
+        Returns:
+            float: output state (0/1) from signal generator
+
+        """
+
+        return int(self._query('OUTP:STAT?'))
+
 
 class SignalGenerator(Hittite):
     """For backwards compatibility with Bob's code...
