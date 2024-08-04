@@ -126,7 +126,6 @@ class Hittite(GenericInstrument):
 
         return int(self._query('OUTP:STAT?'))
 
-
 class SignalGenerator(Hittite):
     """For backwards compatibility with Bob's code...
     
