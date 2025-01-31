@@ -145,6 +145,15 @@ class AgilentE8257D(GenericInstrument):
         msg = ":OUTP OFF"
         self._send(msg)
 
+    def get_output_state(self):
+        """Get output on/off state from signal generator.
+
+        Returns:
+            float: output state (0/1) from signal generator
+
+        """
+
+        return int(self._query('OUTP:STAT?'))
 
 # Helper functions -----------------------------------------------------------
 
